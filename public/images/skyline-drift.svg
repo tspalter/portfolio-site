@@ -1,0 +1,14 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6b8bff;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#6b8bff;stop-opacity:0.1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="#0a122a"/>
+  <rect width="400" height="300" fill="url(#grad)"/>
+  <circle cx="200" cy="150" r="60" fill="#6b8bff" opacity="0.15"/>
+  <circle cx="200" cy="150" r="40" fill="#6b8bff" opacity="0.25"/>
+  <circle cx="200" cy="150" r="20" fill="#6b8bff" opacity="0.4"/>
+  <text x="200" y="160" font-family="Inter, sans-serif" font-size="18" fill="#9aa5c4" text-anchor="middle" opacity="0.6">Project Preview</text>
+</svg>

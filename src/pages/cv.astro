@@ -1,0 +1,100 @@
+---
+import Layout from '../layouts/Layout.astro';
+const education = [
+	{ title: 'Master of Science in Game Development', institution: 'Example University', date: '2025', details: 'Specialized in systems design, interactive storytelling, and procedural worlds.' },
+	{ title: 'Bachelor of Science in Computer Science', institution: 'Example Institute of Technology', date: '2022', details: 'Focused on real-time graphics, AI, and game engine development.' },
+];
+
+const experience = [
+	{ title: 'Gameplay Engineer', company: 'Next Level Studio', date: '2024 – Present', summary: 'Built combat and progression systems for a multi-platform action game. Owned feature implementation, tuning, and delivery across sprint cycles.' },
+	{ title: 'Junior Systems Designer', company: 'Indie Arcade Lab', date: '2022 – 2024', summary: 'Designed and shipped mission systems, player incentives, and tutorial flow for a portfolio of indie titles.' },
+];
+
+const projects = [
+	{ title: 'AAA-style combat prototype with responsive enemy behavior', role: 'Programmer – Combat systems, enemy AI' },
+	{ title: 'Procedural level generator for narrative exploration', role: 'Systems engineer – Procedural generation, level design tools' },
+	{ title: 'Master thesis game system with architecture-inspired spatial design', role: 'Designer & programmer – Spatial systems, narrative integration' },
+	{ title: 'Platformer toolkit used for rapid iteration and polish', role: 'Tools engineer – Movement mechanics, editor integration' },
+];
+
+const certifications = [
+	'Unity Certified Programmer',
+	'Unreal Engine Gameplay Framework',
+	'Professional Scrum Product Owner (PSPO I)',
+];
+---
+
+<Layout currentPath="/cv">
+	<section class="section">
+		<div class="section-header">
+			<span class="section-label">CV</span>
+			<h1 class="page-title">Education, experience, and the full body of work.</h1>
+			<p class="lead">This page collects the core career details and project experience that explain the value I bring to hiring teams.</p>
+		</div>
+
+		<div class="grid-split">
+			<div class="detail-block">
+				<h2>Education</h2>
+				<ul class="detail-list">
+					{education.map((item) => (
+						<li class="detail-item">
+							<strong>{item.title}</strong>
+							<span>{item.institution} • {item.date}</span>
+							<p class="card-text">{item.details}</p>
+						</li>
+					))}
+				</ul>
+			</div>
+
+			<div class="detail-block">
+				<h2>Professional experience</h2>
+				<ul class="detail-list">
+					{experience.map((item) => (
+						<li class="detail-item">
+							<strong>{item.title}</strong>
+							<span>{item.company} • {item.date}</span>
+							<p class="card-text">{item.summary}</p>
+						</li>
+					))}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<section class="section">
+		<div class="section-header">
+			<span class="section-label">Highlights</span>
+			<h2>Projects and certifications that support my work.</h2>
+		</div>
+
+		<div class="grid-split">
+			<div class="card">
+				<h3 class="card-title">Projects</h3>
+				<ul class="project-list">
+					{projects.map((project) => (
+						<li class="project-item">
+							<strong>{project.title}</strong>
+							<span>{project.role}</span>
+						</li>
+					))}
+				</ul>
+			</div>
+
+			<div class="card">
+				<h3 class="card-title">Certifications</h3>
+				<ul class="cert-list">
+					{certifications.map((cert) => (
+						<li class="cert-item">{cert}</li>
+					))}
+				</ul>
+			</div>
+		</div>
+
+		<div class="card card-footer resume-card">
+			<p class="lead">Download a polished PDF resume to share with recruiters and producers.</p>
+			<div class="resume-button-wrapper">
+				<a class="button button-compact" href="/resume.pdf" download>Download Resume</a>
+			</div>
+		</div>
+	</section>
+</Layout>

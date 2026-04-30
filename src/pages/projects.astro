@@ -1,0 +1,68 @@
+---
+import Layout from '../layouts/Layout.astro';
+const projects = [
+	{
+		title: 'Pulse Engine',
+		summary: 'A modular gameplay engine for action RPG systems with responsive combat and dynamic pacing.',
+		role: 'Lead systems engineer',
+		tech: 'Unity, C#, DOTS, gameplay scripting',
+		link: 'https://example.com/pulse-engine',
+		action: 'View demo',
+		image: '/images/pulse-engine.svg',
+	},
+	{
+		title: 'Skyline Drift',
+		summary: 'A narrative-driven platformer that blends architecture-inspired movement with environmental storytelling.',
+		role: 'Designer + programmer',
+		tech: 'Unreal Engine, level design, animation state machines',
+		link: 'https://example.com/skyline-drift',
+		action: 'Open site',
+		image: '/images/skyline-drift.svg',
+	},
+	{
+		title: 'Thesis: Spatial Dialogue',
+		summary: 'Master’s thesis project exploring spatial storytelling and branching player choice inside a modular world.',
+		role: 'Research lead',
+		tech: 'Unity, interactive narrative, procedural layout',
+		link: 'https://example.com/thesis',
+		action: 'Read case study',
+		image: '/images/spatial-dialogue.svg',
+	},
+	{
+		title: 'Architecture Portfolio',
+		summary: 'A curated gallery of spatial design work, concept studies, and interactive layout thinking.',
+		role: 'Creative director',
+		tech: 'Portfolio site, visual communication, experiential space design',
+		link: 'https://example.com/architecture-portfolio',
+		action: 'Visit portfolio',
+		image: '/images/architecture-portfolio.svg',
+	},
+];
+---
+
+<Layout currentPath="/projects">
+	<section class="section">
+		<div class="section-header">
+			<span class="section-label">Projects</span>
+			<h1 class="page-title">Interactive work, thesis research, and polished game systems.</h1>
+			<p class="lead">Each project below includes a link to a live prototype, download, or case study so you can explore the systems and experiences I build.</p>
+		</div>
+
+		<div class="cards">
+			{projects.map((project) => (
+				<article class="card">
+					<img src={project.image} alt={project.title} class="card-image" />
+					<div class="card-content">
+						<h2 class="card-title">{project.title}</h2>
+						<p class="card-meta">{project.role}</p>
+						<p class="card-text">{project.summary}</p>
+						<p class="card-meta">Tech: {project.tech}</p>
+						<div class="project-actions">
+							<a class="button" href={project.link} target="_blank" rel="noreferrer">{project.action}</a>
+						</div>
+					</div>
+				</article>
+			))}
+		</div>
+	</section>
+</Layout>

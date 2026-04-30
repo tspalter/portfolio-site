@@ -1,0 +1,14 @@
+<svg viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#45c0ff" stop-opacity="0.28" />
+      <stop offset="100%" stop-color="#1b2a4d" stop-opacity="0.18" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="280" fill="#08122c" />
+  <rect width="400" height="280" fill="url(#grad)" />
+  <path d="M56 220L112 96L180 160L246 96L344 228" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
+  <circle cx="108" cy="176" r="16" fill="#ffffff" opacity="0.4" />
+  <circle cx="222" cy="120" r="12" fill="#ffffff" opacity="0.35" />
+  <text x="50%" y="240" text-anchor="middle" font-family="Inter, sans-serif" font-size="20" fill="#cfd8ff" opacity="0.85">Architecture Portfolio</text>
+</svg>

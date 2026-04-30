@@ -1,0 +1,87 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const blogPostFiles = import.meta.glob('../blogposts/*.md', { eager: true, as: 'raw' });
+
+function parseFrontmatter(raw: string) {
+	const data: Record<string, any> = {};
+	raw.split(/\r?\n/).forEach((line) => {
+		const [key, ...rest] = line.split(':');
+		if (!key) return;
+		const value = rest.join(':').trim();
+		if (key === 'tags') {
+			data.tags = value
+				.replace(/^\[|\]$/g, '')
+				.split(',')
+				.map((tag) => tag.trim().replace(/^['"]|['"]$/g, ''));
+		} else {
+			data[key] = value.replace(/^['"]|['"]$/g, '');
+		}
+	});
+	return data;
+}
+
+const posts: Array<{ title: string; author: string; tags: string[]; summary: string; }> = Object.entries(blogPostFiles).map(([path, raw]: [string, string]) => {
+	const text = raw;
+	const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+	const frontmatter = match ? parseFrontmatter(match[1]) : {};
+	const body = match ? match[2].trim() : text.trim();
+	return {
+		title: frontmatter.title || '',
+		author: frontmatter.author || '',
+		tags: frontmatter.tags || [],
+		summary: body,
+	};
+}).sort((a, b) => b.author.localeCompare(a.author));
+
+const tags = ['All', 'Game Development', 'Game Analysis', 'Music', 'Industry'];
+---
+
+<Layout currentPath="/blog">
+	<section class="section">
+		<div class="section-header">
+			<span class="section-label">Blog</span>
+			<h1 class="page-title">Essays, analysis, and notes from the game industry.</h1>
+			<p class="lead">Filter posts by topic to find the writing that matches your interest in development, design, music, or career insights.</p>
+		</div>
+
+		<div class="tag-row">
+			{tags.map((tag, index) => (
+				<button type="button" class={index === 0 ? 'filter-button active' : 'filter-button'} data-tag={tag}>{tag}</button>
+			))}
+		</div>
+
+		<div class="blog-grid">
+			{posts.map((post) => (
+				<article class="blog-post" data-tags={post.tags.join(',')}>
+					<h2 class="post-heading">{post.title}</h2>
+					<div class="post-meta">
+						<span>{post.author}</span>
+								{post.tags.map((tag: string) => (<span class="tag-chip">{tag}</span>))}
+					</div>
+					<p class="blog-copy">{post.summary}</p>
+				</article>
+			))}
+		</div>
+	</section>
+</Layout>
+
+<script is:inline>
+const buttons = document.querySelectorAll('.filter-button');
+const posts = document.querySelectorAll('.blog-post');
+
+function filterPosts(tag) {
+	posts.forEach((post) => {
+		const tags = post.dataset.tags.split(',');
+		post.style.display = tag === 'All' || tags.includes(tag) ? 'grid' : 'none';
+	});
+}
+
+buttons.forEach((button) => {
+	button.addEventListener('click', () => {
+		buttons.forEach((item) => item.classList.remove('active'));
+		button.classList.add('active');
+		filterPosts(button.dataset.tag);
+	});
+});
+</script>

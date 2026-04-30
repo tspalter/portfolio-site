@@ -1,11 +1,80 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const featuredProjects = [
+	{
+		title: 'Pulse Engine',
+		description: 'A combat system prototype built for responsive action, tuned with polish and performance in mind.',
+		meta: 'Systems · Combat · Unity',
+		image: '/images/pulse-engine.svg',
+		href: '/projects',
+	},
+	{
+		title: 'Skyline Drift',
+		description: 'A spatial platformer with architecture-driven level design and immersive player flow.',
+		meta: 'Design · Player movement · Unreal',
+		image: '/images/skyline-drift.svg',
+		href: '/projects',
+	},
+	{
+		title: 'Spatial Dialogue',
+		description: "Master's thesis project exploring narrative systems inside procedural environments.",
+		meta: 'Research · Narrative · Interactive spaces',
+		image: '/images/spatial-dialogue.svg',
+		href: '/projects',
+	},
+];
 ---
 
-<Layout>
-	<Welcome />
+<Layout currentPath="/">
+	<section class="section">
+		<div class="section-header">
+			<span class="section-label">Home</span>
+			<h1 class="page-title">Game development work built to stand out.</h1>
+			<p class="lead">I create gameplay systems, interactive worlds, and creative tools for games that need strong mechanics, polish, and player-first clarity.</p>
+		</div>
+
+		<div class="highlight-grid">
+			<div class="highlight-panel">
+				<h2>Who I am</h2>
+				<p class="card-text">A game developer with experience across systems design, engine implementation, and narrative-driven projects. I bring technical confidence, thoughtful iteration, and a product mindset to every build.</p>
+				<ul class="feature-list">
+					<li class="feature-item"><strong>Gameplay systems</strong><p>Combat, progression, AI, and reusable toolkits.</p></li>
+					<li class="feature-item"><strong>Production speed</strong><p>Clear architecture, solid documentation, and shipping milestones.</p></li>
+					<li class="feature-item"><strong>Creative collaboration</strong><p>Team-focused iteration with artists, designers, and producers.</p></li>
+				</ul>
+			</div>
+
+			<div class="highlight-panel">
+				<h2>Where I want to contribute</h2>
+				<ul class="feature-list">
+					<li class="feature-item"><strong>Interactive systems</strong><p>Building mechanics that adapt to player style and feel fun to master.</p></li>
+					<li class="feature-item"><strong>Playable polish</strong><p>Attention to feedback, clarity, and satisfying movement.</p></li>
+					<li class="feature-item"><strong>Studio-ready output</strong><p>Delivered features that are reliable, maintainable, and ready for scale.</p></li>
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<section class="section">
+		<div class="section-header">
+			<span class="section-label">Featured projects</span>
+			<h2>Highlights from my portfolio</h2>
+		</div>
+
+		<div class="cards">
+			{featuredProjects.map((project) => (
+				<article class="card">
+					<img src={project.image} alt={project.title} class="card-image" />
+					<div class="card-content">
+						<h2 class="card-title">{project.title}</h2>
+						<p class="card-meta">{project.meta}</p>
+						<p class="card-text">{project.description}</p>
+						<div class="card-footer">
+							<a class="button" href={project.href}>Explore project</a>
+						</div>
+					</div>
+				</article>
+			))}
+		</div>
+	</section>
 </Layout>
