@@ -21,18 +21,27 @@ function parseFrontmatter(raw: string) {
 	return data;
 }
 
-const posts: Array<{ title: string; author: string; tags: string[]; summary: string; }> = Object.entries(blogPostFiles).map(([path, raw]: [string, string]) => {
+const posts: Array<{ title: string; date_posted: string; tags: string[]; summary: string; body: string; }> = Object.entries(blogPostFiles).map(([path, raw]: [string, string]) => {
 	const text = raw;
 	const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
 	const frontmatter = match ? parseFrontmatter(match[1]) : {};
 	const body = match ? match[2].trim() : text.trim();
+	const summary = frontmatter.summary || body.split('\n')[0] || '';
 	return {
 		title: frontmatter.title || '',
-		author: frontmatter.author || '',
+		date_posted: frontmatter.date_posted || '',
 		tags: frontmatter.tags || [],
-		summary: body,
+		summary: summary,
+		body: body,
 	};
-}).sort((a, b) => b.author.localeCompare(a.author));
+}).sort((a, b) => b.date_posted.localeCompare(a.date_posted));
+
+const postNumbers = Object.keys(blogPostFiles).map(path => {
+	const match = path.match(/post(\d+)\.md$/);
+	return match ? parseInt(match[1]) : 0;
+});
+const nextPostNumber = Math.max(...postNumbers, 0) + 1;
+const nextPostFilename = `post${nextPostNumber.toString().padStart(5, '0')}.md`;
 
 const tags = ['All', 'Game Development', 'Game Analysis', 'Music', 'Industry'];
 ---
@@ -41,8 +50,8 @@ const tags = ['All', 'Game Development', 'Game Analysis', 'Music', 'Industry'];
 	<section class="section">
 		<div class="section-header">
 			<span class="section-label">Blog</span>
-			<h1 class="page-title">Essays, analysis, and notes from the game industry.</h1>
-			<p class="lead">Filter posts by topic to find the writing that matches your interest in development, design, music, or career insights.</p>
+			<h1 class="page-title">From the desk of Thomas</h1>
+			<p class="lead">Some thoughts and feelings that I have regarding games and the industry. Use the filters to browse posts by topic, and thank you for reading!</p>
 		</div>
 
 		<div class="tag-row">
@@ -51,30 +60,121 @@ const tags = ['All', 'Game Development', 'Game Analysis', 'Music', 'Industry'];
 			))}
 		</div>
 
+		<div class="create-post-section">
+			<button type="button" class="create-post-button" id="createPostButton">Create New Post</button>
+		</div>
+
 		<div class="blog-grid">
-			{posts.map((post) => (
-				<article class="blog-post" data-tags={post.tags.join(',')}>
+			{posts.map((post, index) => (
+				<article class="blog-post clickable-post" data-tags={post.tags.join(',')} data-post-id={index}>
 					<h2 class="post-heading">{post.title}</h2>
 					<div class="post-meta">
-						<span>{post.author}</span>
-								{post.tags.map((tag: string) => (<span class="tag-chip">{tag}</span>))}
+						<span>{post.date_posted}</span>
+					</div>
+					<div class="post-tags">
+						{post.tags.map((tag: string) => (<span class="tag-chip">{tag}</span>))}
 					</div>
 					<p class="blog-copy">{post.summary}</p>
 				</article>
 			))}
 		</div>
+
+		<div class="post-modal-backdrop" id="postModalBackdrop"></div>
+		<div class="post-modal" id="postModal">
+			<button class="modal-close" id="modalClose">×</button>
+			<h2 class="modal-title" id="modalTitle"></h2>
+			<div class="modal-meta">
+				<span id="modalDate"></span>
+			</div>
+			<div class="modal-tags" id="modalTags"></div>
+			<div class="modal-body" id="modalBody"></div>
+		</div>
+
+		<div class="create-post-modal-backdrop" id="createPostModalBackdrop"></div>
+		<div class="create-post-modal" id="createPostModal">
+			<button class="modal-close" id="createModalClose">×</button>
+			<h2 class="modal-title">Create New Post</h2>
+			<form id="createPostForm">
+				<div class="form-group">
+					<label for="postTitle">Title</label>
+					<input type="text" id="postTitle" name="title" required>
+				</div>
+				<div class="form-group">
+					<label for="postSummary">Summary</label>
+					<input type="text" id="postSummary" name="summary" required>
+				</div>
+				<div class="form-group">
+					<label>Tags</label>
+					<div class="tags-selection">
+						{tags.slice(1).map(tag => (
+							<label class="tag-checkbox">
+								<input type="checkbox" value={tag}>
+								<span>{tag}</span>
+							</label>
+						))}
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="postBody">Body</label>
+					<textarea id="postBody" name="body" rows="10" required></textarea>
+				</div>
+				<div class="form-group">
+					<label>Embed Media (optional)</label>
+					<div class="media-embeds">
+						<input type="url" placeholder="Image URL" id="imageUrl">
+						<input type="url" placeholder="Video URL" id="videoUrl">
+						<input type="url" placeholder="GIF URL" id="gifUrl">
+						<input type="url" placeholder="Music URL (.mp3 or .wav)" id="musicUrl">
+						<input type="url" placeholder="Document URL" id="docUrl">
+					</div>
+				</div>
+				<button type="submit" class="post-button">Post</button>
+			</form>
+		</div>
 	</section>
 </Layout>
 
-<script is:inline>
+<script is:inline define:vars={{ posts, nextPostFilename }}>
 const buttons = document.querySelectorAll('.filter-button');
-const posts = document.querySelectorAll('.blog-post');
+const postCards = document.querySelectorAll('.blog-post');
+const modalBackdrop = document.getElementById('postModalBackdrop');
+const modal = document.getElementById('postModal');
+const modalClose = document.getElementById('modalClose');
+
+const createPostButton = document.getElementById('createPostButton');
+const createPostModalBackdrop = document.getElementById('createPostModalBackdrop');
+const createPostModal = document.getElementById('createPostModal');
+const createModalClose = document.getElementById('createModalClose');
+const createPostForm = document.getElementById('createPostForm');
 
 function filterPosts(tag) {
-	posts.forEach((post) => {
+	postCards.forEach((post) => {
 		const tags = post.dataset.tags.split(',');
 		post.style.display = tag === 'All' || tags.includes(tag) ? 'grid' : 'none';
 	});
+}
+
+function openModal(postIndex) {
+	const post = posts[postIndex];
+	if (!post) return;
+	
+	document.getElementById('modalTitle').textContent = post.title;
+	document.getElementById('modalDate').textContent = post.date_posted;
+	
+	const tagsContainer = document.getElementById('modalTags');
+	tagsContainer.innerHTML = post.tags.map((tag) => `<span class="tag-chip">${tag}</span>`).join('');
+	
+	document.getElementById('modalBody').textContent = post.body;
+	
+	modal.classList.add('visible');
+	modalBackdrop.classList.add('visible');
+	document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+	modal.classList.remove('visible');
+	modalBackdrop.classList.remove('visible');
+	document.body.style.overflow = '';
 }
 
 buttons.forEach((button) => {
@@ -83,5 +183,68 @@ buttons.forEach((button) => {
 		button.classList.add('active');
 		filterPosts(button.dataset.tag);
 	});
+});
+
+postCards.forEach((card) => {
+	card.addEventListener('click', () => {
+		openModal(parseInt(card.dataset.postId));
+	});
+});
+
+modalClose.addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', closeModal);
+
+function openCreatePostModal() {
+	createPostModal.classList.add('visible');
+	createPostModalBackdrop.classList.add('visible');
+	document.body.style.overflow = 'hidden';
+}
+
+function closeCreatePostModal() {
+	createPostModal.classList.remove('visible');
+	createPostModalBackdrop.classList.remove('visible');
+	document.body.style.overflow = '';
+}
+
+createPostButton.addEventListener('click', openCreatePostModal);
+createModalClose.addEventListener('click', closeCreatePostModal);
+createPostModalBackdrop.addEventListener('click', closeCreatePostModal);
+
+createPostForm.addEventListener('submit', async (e) => {
+	e.preventDefault();
+	const formData = new FormData(createPostForm);
+	
+	// Get selected tags
+	const selectedTags = Array.from(document.querySelectorAll('.tag-checkbox input:checked')).map(cb => cb.value);
+	formData.set('tags', selectedTags.join(','));
+	
+	// Add media URLs
+	formData.set('imageUrl', document.getElementById('imageUrl').value);
+	formData.set('videoUrl', document.getElementById('videoUrl').value);
+	formData.set('gifUrl', document.getElementById('gifUrl').value);
+	formData.set('musicUrl', document.getElementById('musicUrl').value);
+	formData.set('docUrl', document.getElementById('docUrl').value);
+	
+	try {
+		const response = await fetch('/api/create-post', {
+			method: 'POST',
+			body: formData
+		});
+		
+		const result = await response.json();
+		
+		if (result.success) {
+			alert(`Post created successfully! File: ${result.filename}\n\nThe page will reload to show your new post.`);
+			closeCreatePostModal();
+			createPostForm.reset();
+			// Reload the page to show the new post
+			window.location.reload();
+		} else {
+			alert('Failed to create post: ' + result.message);
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		alert('An error occurred while creating the post.');
+	}
 });
 </script>
