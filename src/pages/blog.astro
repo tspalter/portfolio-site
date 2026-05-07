@@ -21,6 +21,32 @@ function parseFrontmatter(raw: string) {
 	return data;
 }
 
+function parseDateString(value: string) {
+	if (!value) return new Date(0);
+	const iso = value.match(/^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}:\d{2}))?$/);
+	const mmddyy = value.match(/^([0-1]?\d)\/([0-3]?\d)\/(\d{2})(?:\s+(\d{2}:\d{2}:\d{2}))?$/);
+	const ymd = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+	if (iso) {
+		return new Date(`${iso[1]}T${iso[2] || '00:00:00'}`);
+	}
+	if (ymd) {
+		return new Date(`${ymd[1]}-${ymd[2]}-${ymd[3]}T00:00:00`);
+	}
+	if (mmddyy) {
+		return new Date(`20${mmddyy[3]}-${mmddyy[1].padStart(2, '0')}-${mmddyy[2].padStart(2, '0')}T${mmddyy[4] || '00:00:00'}`);
+	}
+	const parsed = Date.parse(value);
+	return Number.isNaN(parsed) ? new Date(0) : new Date(parsed);
+}
+
+function formatDisplayDate(value: string) {
+	const date = parseDateString(value);
+	const mm = String(date.getMonth() + 1).padStart(2, '0');
+	const dd = String(date.getDate()).padStart(2, '0');
+	const yy = String(date.getFullYear()).slice(-2);
+	return `${mm}/${dd}/${yy}`;
+}
+
 const posts: Array<{ title: string; date_posted: string; tags: string[]; summary: string; body: string; }> = Object.entries(blogPostFiles).map(([path, raw]: [string, string]) => {
 	const text = raw;
 	const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
@@ -34,7 +60,7 @@ const posts: Array<{ title: string; date_posted: string; tags: string[]; summary
 		summary: summary,
 		body: body,
 	};
-}).sort((a, b) => b.date_posted.localeCompare(a.date_posted));
+}).sort((a, b) => parseDateString(b.date_posted).getTime() - parseDateString(a.date_posted).getTime());
 
 const postNumbers = Object.keys(blogPostFiles).map(path => {
 	const match = path.match(/post(\d+)\.md$/);
@@ -69,7 +95,7 @@ const tags = ['All', 'Game Development', 'Game Analysis', 'Music', 'Industry'];
 				<article class="blog-post clickable-post" data-tags={post.tags.join(',')} data-post-id={index}>
 					<h2 class="post-heading">{post.title}</h2>
 					<div class="post-meta">
-						<span>{post.date_posted}</span>
+						<span>{formatDisplayDate(post.date_posted)}</span>
 					</div>
 					<div class="post-tags">
 						{post.tags.map((tag: string) => (<span class="tag-chip">{tag}</span>))}
@@ -117,16 +143,16 @@ const tags = ['All', 'Game Development', 'Game Analysis', 'Music', 'Industry'];
 				<div class="form-group">
 					<label for="postBody">Body</label>
 					<textarea id="postBody" name="body" rows="10" required></textarea>
+					<button type="button" id="emojiButton" class="emoji-button">😀</button>
+					<div id="emojiPicker" class="emoji-picker" style="display: none;"></div>
 				</div>
 				<div class="form-group">
 					<label>Embed Media (optional)</label>
-					<div class="media-embeds">
-						<input type="url" placeholder="Image URL" id="imageUrl">
-						<input type="url" placeholder="Video URL" id="videoUrl">
-						<input type="url" placeholder="GIF URL" id="gifUrl">
-						<input type="url" placeholder="Music URL (.mp3 or .wav)" id="musicUrl">
-						<input type="url" placeholder="Document URL" id="docUrl">
+					<div class="media-embed-row">
+						<button type="button" class="secondary-button" id="browseMediaButton">Browse</button>
+						<input type="file" id="mediaFileInput" hidden multiple>
 					</div>
+					<div class="media-items" id="mediaItems"></div>
 				</div>
 				<button type="submit" class="post-button">Post</button>
 			</form>
@@ -135,20 +161,197 @@ const tags = ['All', 'Game Development', 'Game Analysis', 'Music', 'Industry'];
 </Layout>
 
 <script is:inline define:vars={{ posts, nextPostFilename }}>
-const buttons = document.querySelectorAll('.filter-button');
-const postCards = document.querySelectorAll('.blog-post');
-const modalBackdrop = document.getElementById('postModalBackdrop');
-const modal = document.getElementById('postModal');
-const modalClose = document.getElementById('modalClose');
+window.addEventListener('DOMContentLoaded', () => {
+	const buttons = document.querySelectorAll('.filter-button');
+	const postCards = document.querySelectorAll('.blog-post');
+	console.log('blog script loaded', { postCards: postCards.length, buttons: buttons.length });
+	const modal = document.getElementById('postModal');
+	const modalBackdrop = document.getElementById('postModalBackdrop');
+	const modalClose = document.getElementById('modalClose');
+	const createPostButton = document.getElementById('createPostButton');
+	const createPostModalBackdrop = document.getElementById('createPostModalBackdrop');
+	const createPostModal = document.getElementById('createPostModal');
+	const createModalClose = document.getElementById('createModalClose');
+	const createPostForm = document.getElementById('createPostForm');
+	const browseMediaButton = document.getElementById('browseMediaButton');
+	const mediaFileInput = document.getElementById('mediaFileInput');
+	const mediaItemsContainer = document.getElementById('mediaItems');
+	const emojiButton = document.getElementById('emojiButton');
+	const emojiPicker = document.getElementById('emojiPicker');
+	const postBody = document.getElementById('postBody');
 
-const createPostButton = document.getElementById('createPostButton');
-const createPostModalBackdrop = document.getElementById('createPostModalBackdrop');
-const createPostModal = document.getElementById('createPostModal');
-const createModalClose = document.getElementById('createModalClose');
-const createPostForm = document.getElementById('createPostForm');
+	const mediaItems = [];
+	let nextMediaId = 0;
+
+	function parseDateString(value) {
+		if (!value) return new Date(0);
+		const iso = value.match(/^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}:\d{2}))?$/);
+		const mmddyy = value.match(/^([0-1]?\d)\/([0-3]?\d)\/(\d{2})(?:\s+(\d{2}:\d{2}:\d{2}))?$/);
+		const ymd = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+		if (iso) {
+			return new Date(`${iso[1]}T${iso[2] || '00:00:00'}`);
+		}
+		if (ymd) {
+			return new Date(`${ymd[1]}-${ymd[2]}-${ymd[3]}T00:00:00`);
+		}
+		if (mmddyy) {
+			return new Date(`20${mmddyy[3]}-${mmddyy[1].padStart(2, '0')}-${mmddyy[2].padStart(2, '0')}T${mmddyy[4] || '00:00:00'}`);
+		}
+		const parsed = Date.parse(value);
+		return Number.isNaN(parsed) ? new Date(0) : new Date(parsed);
+	}
+
+	function formatDisplayDate(value) {
+		const date = parseDateString(value);
+		const mm = String(date.getMonth() + 1).padStart(2, '0');
+		const dd = String(date.getDate()).padStart(2, '0');
+		const yy = String(date.getFullYear()).slice(-2);
+		return `${mm}/${dd}/${yy}`;
+	}
+
+	function extractPdfAttachments(body) {
+		const pdfPattern = /\[([^\]]+)\]\(([^)]*\.pdf(?:\?[^)]*)?)\)/gi;
+		const pdfs = [];
+		let match;
+		while ((match = pdfPattern.exec(body)) !== null) {
+			pdfs.push({ text: match[1], url: match[2] });
+		}
+		return pdfs;
+	}
+
+function getMediaKind(value) {
+	const normalized = value.toLowerCase();
+	if (normalized.trim().startsWith('<')) return 'embed';
+	if (/\.(png|jpe?g|webp|avif|gif)(\?.*)?$/.test(normalized)) return 'image';
+	if (/\.(mp4|webm|ogg)(\?.*)?$/.test(normalized)) return 'video';
+	if (/\.(mp3|wav|m4a|ogg)(\?.*)?$/.test(normalized)) return 'audio';
+	if (/\.(pdf)(\?.*)?$/.test(normalized)) return 'pdf';
+	if (/\.(docx?|xlsx?|pptx?)(\?.*)?$/.test(normalized)) return 'document';
+	if (/^(https?:\/\/|www\.)/.test(normalized)) return 'link';
+	return 'embed';
+}
+
+function createMediaItem(item) {
+	const element = document.createElement('div');
+	element.className = 'media-item';
+	element.dataset.id = item.id;
+
+	const preview = document.createElement('div');
+	preview.className = 'media-preview';
+
+	if (item.kind === 'image') {
+		const image = document.createElement('img');
+		image.src = item.previewUrl || item.value;
+		image.alt = item.name || 'Image preview';
+		preview.appendChild(image);
+	} else {
+		const label = document.createElement('span');
+		label.textContent = item.kind === 'embed' ? 'Embed' : item.kind === 'link' ? 'URL' : item.kind === 'video' ? 'Video' : item.kind === 'audio' ? 'Audio' : 'File';
+		preview.appendChild(label);
+	}
+
+	const meta = document.createElement('div');
+	meta.className = 'media-meta';
+
+	const title = document.createElement('span');
+	title.className = 'media-item-name';
+	title.textContent = item.name || item.value || 'Media item';
+	meta.appendChild(title);
+
+	if (item.kind === 'link' || item.kind === 'embed') {
+		const subtitle = document.createElement('span');
+		subtitle.className = 'media-item-type';
+		subtitle.textContent = item.kind === 'embed' ? 'Embed code' : item.value;
+		meta.appendChild(subtitle);
+	}
+
+	const removeButton = document.createElement('button');
+	removeButton.type = 'button';
+	removeButton.className = 'remove-media';
+	removeButton.textContent = 'Remove';
+	removeButton.addEventListener('click', () => {
+		const index = mediaItems.findIndex((entry) => entry.id === item.id);
+		if (index > -1) {
+			if (mediaItems[index].previewUrl) {
+				URL.revokeObjectURL(mediaItems[index].previewUrl);
+			}
+			mediaItems.splice(index, 1);
+			renderMediaItems();
+		}
+	});
+
+	element.appendChild(preview);
+	element.appendChild(meta);
+	element.appendChild(removeButton);
+	return element;
+}
+
+function renderMediaItems() {
+	mediaItemsContainer.innerHTML = '';
+	mediaItems.forEach((item) => {
+		mediaItemsContainer.appendChild(createMediaItem(item));
+	});
+}
+
+function addMediaUrl(value) {
+	if (!value.trim()) return;
+	const kind = getMediaKind(value);
+	mediaItems.push({
+		id: `media-${nextMediaId++}`,
+		kind,
+		value,
+		name: value,
+		previewUrl: kind === 'image' ? value : null,
+		file: null,
+	});
+	renderMediaItems();
+}
+
+function addMediaFile(file) {
+	const kind = getMediaKind(file.name);
+	const previewUrl = kind === 'image' ? URL.createObjectURL(file) : null;
+	mediaItems.push({
+		id: `media-${nextMediaId++}`,
+		kind,
+		value: file.name,
+		name: file.name,
+		previewUrl,
+		file,
+	});
+	renderMediaItems();
+}
+
+browseMediaButton.addEventListener('click', () => mediaFileInput.click());
+mediaFileInput.addEventListener('change', () => {
+	Array.from(mediaFileInput.files).forEach((file) => addMediaFile(file));
+	mediaFileInput.value = '';
+});
+
+const emojis = ['😀', '😂', '😊', '😍', '🤔', '👍', '👎', '❤️', '🔥', '🎉', '😢', '😎', '🤗', '😴', '🤤'];
+
+function insertAtCursor(textarea, text) {
+	const start = textarea.selectionStart;
+	const end = textarea.selectionEnd;
+	const before = textarea.value.substring(0, start);
+	const after = textarea.value.substring(end);
+	textarea.value = before + text + after;
+	textarea.selectionStart = textarea.selectionEnd = start + text.length;
+	textarea.focus();
+}
+
+emojiPicker.innerHTML = emojis.map(emoji => `<span class="emoji-item" style="cursor: pointer; font-size: 24px; margin: 4px;">${emoji}</span>`).join('');
+emojiPicker.addEventListener('click', (event) => {
+	if (event.target.classList.contains('emoji-item')) {
+		insertAtCursor(postBody, event.target.textContent);
+	}
+});
+
+emojiButton.addEventListener('click', () => {
+	emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
+});
 
 function filterPosts(tag) {
-	postCards.forEach((post) => {
+	document.querySelectorAll('.blog-post').forEach((post) => {
 		const tags = post.dataset.tags.split(',');
 		post.style.display = tag === 'All' || tags.includes(tag) ? 'grid' : 'none';
 	});
@@ -156,18 +359,69 @@ function filterPosts(tag) {
 
 function openModal(postIndex) {
 	const post = posts[postIndex];
-	if (!post) return;
-	
-	document.getElementById('modalTitle').textContent = post.title;
-	document.getElementById('modalDate').textContent = post.date_posted;
-	
+	if (!post) {
+		console.error('openModal: post not found', postIndex);
+		return;
+	}
+
+	const modalElement = document.getElementById('postModal');
+	const modalBackdropElement = document.getElementById('postModalBackdrop');
+	const modalTitle = document.getElementById('modalTitle');
+	const modalDate = document.getElementById('modalDate');
 	const tagsContainer = document.getElementById('modalTags');
+	const modalBody = document.getElementById('modalBody');
+
+	if (!modalElement || !modalBackdropElement || !modalTitle || !modalDate || !tagsContainer || !modalBody) {
+		return;
+	}
+
+	modalTitle.textContent = post.title;
+	modalDate.textContent = formatDisplayDate(post.date_posted);
 	tagsContainer.innerHTML = post.tags.map((tag) => `<span class="tag-chip">${tag}</span>`).join('');
-	
-	document.getElementById('modalBody').textContent = post.body;
-	
-	modal.classList.add('visible');
-	modalBackdrop.classList.add('visible');
+
+	const renderedBody = window.marked
+		? typeof window.marked.parse === 'function'
+			? window.marked.parse(post.body)
+			: typeof window.marked === 'function'
+				? window.marked(post.body)
+				: null
+		: null;
+	if (renderedBody !== null) {
+		modalBody.innerHTML = renderedBody;
+	} else {
+		modalBody.textContent = post.body;
+	}
+
+	const pdfAttachments = extractPdfAttachments(post.body);
+	if (pdfAttachments.length > 0) {
+		const attachmentsDiv = document.createElement('div');
+		for (const pdf of pdfAttachments) {
+			const pdfContainer = document.createElement('div');
+			pdfContainer.className = 'pdf-attachment';
+			
+			const pdfButton = document.createElement('button');
+			pdfButton.type = 'button';
+			pdfButton.className = 'pdf-button';
+			pdfButton.innerHTML = '📄 ' + pdf.text;
+			pdfButton.addEventListener('click', () => window.open(pdf.url, '_blank'));
+			
+			const downloadLink = document.createElement('a');
+			downloadLink.href = pdf.url;
+			downloadLink.download = pdf.text;
+			downloadLink.className = 'download-icon';
+			downloadLink.innerHTML = '⬇️';
+			downloadLink.title = 'Download';
+			
+			pdfContainer.appendChild(pdfButton);
+			pdfContainer.appendChild(downloadLink);
+			attachmentsDiv.appendChild(pdfContainer);
+		}
+		modalBody.appendChild(attachmentsDiv);
+	}
+
+	console.log('opening modal', { postIndex, modalElement, modalBackdropElement, modalBody });
+	modalElement.classList.add('visible');
+	modalBackdropElement.classList.add('visible');
 	document.body.style.overflow = 'hidden';
 }
 
@@ -185,14 +439,24 @@ buttons.forEach((button) => {
 	});
 });
 
+if (postCards.length === 0) {
+	console.warn('No blog post cards found.');
+}
+
 postCards.forEach((card) => {
+	const postId = card.dataset.postId;
+	console.log('attach blog post click', { postId });
+	if (!postId) return;
 	card.addEventListener('click', () => {
-		openModal(parseInt(card.dataset.postId));
+		console.log('blog post clicked', { postId });
+		openModal(parseInt(postId, 10));
 	});
 });
 
 modalClose.addEventListener('click', closeModal);
-modalBackdrop.addEventListener('click', closeModal);
+if (modalBackdrop) {
+	modalBackdrop.addEventListener('click', closeModal);
+}
 
 function openCreatePostModal() {
 	createPostModal.classList.add('visible');
@@ -212,32 +476,31 @@ createPostModalBackdrop.addEventListener('click', closeCreatePostModal);
 
 createPostForm.addEventListener('submit', async (e) => {
 	e.preventDefault();
+
 	const formData = new FormData(createPostForm);
-	
-	// Get selected tags
 	const selectedTags = Array.from(document.querySelectorAll('.tag-checkbox input:checked')).map(cb => cb.value);
 	formData.set('tags', selectedTags.join(','));
-	
-	// Add media URLs
-	formData.set('imageUrl', document.getElementById('imageUrl').value);
-	formData.set('videoUrl', document.getElementById('videoUrl').value);
-	formData.set('gifUrl', document.getElementById('gifUrl').value);
-	formData.set('musicUrl', document.getElementById('musicUrl').value);
-	formData.set('docUrl', document.getElementById('docUrl').value);
-	
+
+	const urlItems = mediaItems.filter((item) => !item.file).map((item) => ({ value: item.value, kind: item.kind }));
+	formData.set('mediaItems', JSON.stringify(urlItems));
+	mediaItems.filter((item) => item.file).forEach((item) => {
+		formData.append('mediaFiles', item.file, item.file.name);
+	});
+
 	try {
 		const response = await fetch('/api/create-post', {
 			method: 'POST',
 			body: formData
 		});
-		
+
 		const result = await response.json();
-		
+
 		if (result.success) {
 			alert(`Post created successfully! File: ${result.filename}\n\nThe page will reload to show your new post.`);
 			closeCreatePostModal();
 			createPostForm.reset();
-			// Reload the page to show the new post
+			mediaItems.length = 0;
+			renderMediaItems();
 			window.location.reload();
 		} else {
 			alert('Failed to create post: ' + result.message);
@@ -246,5 +509,6 @@ createPostForm.addEventListener('submit', async (e) => {
 		console.error('Error:', error);
 		alert('An error occurred while creating the post.');
 	}
+});
 });
 </script>
