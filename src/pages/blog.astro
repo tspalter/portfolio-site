@@ -68,6 +68,7 @@ const postNumbers = Object.keys(blogPostFiles).map(path => {
 });
 const nextPostNumber = Math.max(...postNumbers, 0) + 1;
 const nextPostFilename = `post${nextPostNumber.toString().padStart(5, '0')}.md`;
+const isDev = import.meta.env.DEV;
 
 const tags = ['All', 'Game Development', 'Game Analysis', 'Music', 'Industry'];
 ---
@@ -87,7 +88,9 @@ const tags = ['All', 'Game Development', 'Game Analysis', 'Music', 'Industry'];
 		</div>
 
 		<div class="create-post-section">
-			<button type="button" class="create-post-button" id="createPostButton">Create New Post</button>
+			{isDev && (
+				<button type="button" class="create-post-button" id="createPostButton">Create New Post</button>
+			)}
 		</div>
 
 		<div class="blog-grid">
@@ -143,8 +146,6 @@ const tags = ['All', 'Game Development', 'Game Analysis', 'Music', 'Industry'];
 				<div class="form-group">
 					<label for="postBody">Body</label>
 					<textarea id="postBody" name="body" rows="10" required></textarea>
-					<button type="button" id="emojiButton" class="emoji-button">😀</button>
-					<div id="emojiPicker" class="emoji-picker" style="display: none;"></div>
 				</div>
 				<div class="form-group">
 					<label>Embed Media (optional)</label>
@@ -176,8 +177,6 @@ window.addEventListener('DOMContentLoaded', () => {
 	const browseMediaButton = document.getElementById('browseMediaButton');
 	const mediaFileInput = document.getElementById('mediaFileInput');
 	const mediaItemsContainer = document.getElementById('mediaItems');
-	const emojiButton = document.getElementById('emojiButton');
-	const emojiPicker = document.getElementById('emojiPicker');
 	const postBody = document.getElementById('postBody');
 
 	const mediaItems = [];
@@ -327,8 +326,6 @@ mediaFileInput.addEventListener('change', () => {
 	mediaFileInput.value = '';
 });
 
-const emojis = ['😀', '😂', '😊', '😍', '🤔', '👍', '👎', '❤️', '🔥', '🎉', '😢', '😎', '🤗', '😴', '🤤'];
-
 function insertAtCursor(textarea, text) {
 	const start = textarea.selectionStart;
 	const end = textarea.selectionEnd;
@@ -338,17 +335,6 @@ function insertAtCursor(textarea, text) {
 	textarea.selectionStart = textarea.selectionEnd = start + text.length;
 	textarea.focus();
 }
-
-emojiPicker.innerHTML = emojis.map(emoji => `<span class="emoji-item" style="cursor: pointer; font-size: 24px; margin: 4px;">${emoji}</span>`).join('');
-emojiPicker.addEventListener('click', (event) => {
-	if (event.target.classList.contains('emoji-item')) {
-		insertAtCursor(postBody, event.target.textContent);
-	}
-});
-
-emojiButton.addEventListener('click', () => {
-	emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
-});
 
 function filterPosts(tag) {
 	document.querySelectorAll('.blog-post').forEach((post) => {
@@ -470,7 +456,9 @@ function closeCreatePostModal() {
 	document.body.style.overflow = '';
 }
 
-createPostButton.addEventListener('click', openCreatePostModal);
+if (createPostButton) {
+		createPostButton.addEventListener('click', openCreatePostModal);
+	}
 createModalClose.addEventListener('click', closeCreatePostModal);
 createPostModalBackdrop.addEventListener('click', closeCreatePostModal);
 

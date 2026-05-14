@@ -13,9 +13,10 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",
-    "@astrojs/db": "^0.21.0",
-    "@astrojs/node": "^10.0.6",
-    "astro": "^6.1.9",
+    "@astrojs/db": "^0.21.1",
+    "@astrojs/node": "^10.1.0",
+    "@joeattardi/emoji-button": "^4.6.4",
+    "astro": "^6.3.1",
     "marked": "^18.0.3",
     "typescript": "^5.9.3"
   }

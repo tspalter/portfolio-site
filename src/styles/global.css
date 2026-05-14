@@ -599,6 +599,73 @@ button:hover,
 	transition: background 0.2s ease;
 }
 
+/* Reel styles */
+.reel-container {
+	position: relative;
+	overflow: hidden;
+	border-radius: 28px;
+	background: linear-gradient(180deg, rgba(122, 139, 255, 0.08), rgba(12, 18, 38, 0.96));
+	border: 1px solid var(--border);
+}
+
+.reel {
+	display: flex;
+	transition: transform 0.5s ease;
+}
+
+.reel-item {
+	flex-shrink: 0;
+	width: 100%;
+	height: 400px;
+	object-fit: cover;
+	display: block;
+}
+
+.reel-item img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.reel-item video {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.reel-arrow {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 3rem;
+	height: 3rem;
+	background: rgba(0, 0, 0, 0.5);
+	border: none;
+	border-radius: 50%;
+	color: white;
+	font-size: 1.5rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+	z-index: 10;
+}
+
+.reel-arrow:hover {
+	background: rgba(0, 0, 0, 0.7);
+	transform: translateY(-50%);
+	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.reel-arrow.left {
+	left: 1rem;
+}
+
+.reel-arrow.right {
+	right: 1rem;
+}
+
 .create-post-button:hover {
 	background: var(--accent-strong);
 }
@@ -821,20 +888,6 @@ button:hover,
 	background: var(--accent-strong);
 }
 
-.emoji-button {
-	margin-left: 10px;
-	font-size: 18px;
-	cursor: pointer;
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: 4px;
-	padding: 0.25rem 0.5rem;
-	transition: background 0.2s ease;
-}
-
-.emoji-button:hover {
-	background: var(--accent-soft);
-}
 
 .pdf-attachment {
 	display: flex;
@@ -872,26 +925,3 @@ button:hover,
 	color: var(--accent);
 }
 
-.emoji-picker {
-	border: 1px solid var(--border);
-	padding: 10px;
-	background: var(--surface);
-	max-width: 250px;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 4px;
-	margin-top: 5px;
-	border-radius: 8px;
-}
-
-.emoji-item {
-	cursor: pointer;
-	font-size: 24px;
-	padding: 2px;
-	transition: background 0.2s ease;
-}
-
-.emoji-item:hover {
-	background: var(--accent-soft);
-	border-radius: 4px;
-}

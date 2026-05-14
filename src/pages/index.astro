@@ -33,26 +33,94 @@ const featuredProjects = [
 			<p class="lead">I create gameplay systems, interactive worlds, and creative tools for games that need strong mechanics, polish, and player-first clarity.</p>
 		</div>
 
-		<div class="highlight-grid">
-			<div class="highlight-panel">
-				<h2>Who I am</h2>
-				<p class="card-text">A game developer with experience across systems design, engine implementation, and narrative-driven projects. I bring technical confidence, thoughtful iteration, and a product mindset to every build.</p>
-				<ul class="feature-list">
-					<li class="feature-item"><strong>Gameplay systems</strong><p>Combat, progression, AI, and reusable toolkits.</p></li>
-					<li class="feature-item"><strong>Production speed</strong><p>Clear architecture, solid documentation, and shipping milestones.</p></li>
-					<li class="feature-item"><strong>Creative collaboration</strong><p>Team-focused iteration with artists, designers, and producers.</p></li>
-				</ul>
+		<div class="reel-container">
+			<button class="reel-arrow left" id="reelLeft">&larr;</button>
+			<div class="reel" id="reel">
+				<div class="reel-item">
+					<img src="/images/architecture-portfolio.svg" alt="Photo 1" />
+				</div>
+				<div class="reel-item">
+					<video src="/videos/placeholder1.mp4" muted loop autoplay></video>
+				</div>
+				<div class="reel-item">
+					<img src="/images/skyline-drift.svg" alt="Photo 2" />
+				</div>
+				<div class="reel-item">
+					<video src="/videos/placeholder2.mp4" muted loop autoplay></video>
+				</div>
+				<div class="reel-item">
+					<img src="/images/spatial-dialogue.svg" alt="Photo 3" />
+				</div>
+				<div class="reel-item">
+					<video src="/videos/placeholder3.mp4" muted loop autoplay></video>
+				</div>
 			</div>
-
-			<div class="highlight-panel">
-				<h2>Where I want to contribute</h2>
-				<ul class="feature-list">
-					<li class="feature-item"><strong>Interactive systems</strong><p>Building mechanics that adapt to player style and feel fun to master.</p></li>
-					<li class="feature-item"><strong>Playable polish</strong><p>Attention to feedback, clarity, and satisfying movement.</p></li>
-					<li class="feature-item"><strong>Studio-ready output</strong><p>Delivered features that are reliable, maintainable, and ready for scale.</p></li>
-				</ul>
-			</div>
+			<button class="reel-arrow right" id="reelRight">&rarr;</button>
 		</div>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				const reel = document.getElementById('reel') as HTMLElement | null;
+				const leftArrow = document.getElementById('reelLeft') as HTMLButtonElement | null;
+				const rightArrow = document.getElementById('reelRight') as HTMLButtonElement | null;
+				if (!reel || !leftArrow || !rightArrow) return;
+				const reelElement = reel;
+
+				const originalItems = Array.from(reelElement.children) as HTMLElement[];
+				const totalItems = originalItems.length;
+				let currentIndex = 0;
+				let isTransitioning = false;
+
+				const firstClone = originalItems[0].cloneNode(true) as HTMLElement;
+				const lastClone = originalItems[totalItems - 1].cloneNode(true) as HTMLElement;
+				reel.insertBefore(lastClone, reel.firstChild);
+				reel.appendChild(firstClone);
+
+				function updatePosition(index: number, instant = false) {
+					reelElement.style.transition = instant ? 'none' : 'transform 0.5s ease';
+					reelElement.style.transform = `translateX(-${(index + 1) * 100}%)`;
+
+					if (instant) {
+						requestAnimationFrame(() => {
+							requestAnimationFrame(() => {
+								reelElement.style.transition = 'transform 0.5s ease';
+							});
+						});
+					}
+				}
+
+				function nextItem() {
+					if (isTransitioning) return;
+					isTransitioning = true;
+					currentIndex += 1;
+					updatePosition(currentIndex);
+				}
+
+				function prevItem() {
+					if (isTransitioning) return;
+					isTransitioning = true;
+					currentIndex -= 1;
+					updatePosition(currentIndex);
+				}
+
+				reel.addEventListener('transitionend', () => {
+					if (currentIndex >= totalItems) {
+						currentIndex = 0;
+						updatePosition(currentIndex, true);
+					} else if (currentIndex < 0) {
+						currentIndex = totalItems - 1;
+						updatePosition(currentIndex, true);
+					}
+					isTransitioning = false;
+				});
+
+				leftArrow.addEventListener('click', prevItem);
+				rightArrow.addEventListener('click', nextItem);
+
+				// Auto scroll every 15 seconds
+				setInterval(nextItem, 15000);
+			});
+		</script>
 	</section>
 
 	<section class="section">
