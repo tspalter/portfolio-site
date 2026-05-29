@@ -2,24 +2,24 @@
 import Layout from '../layouts/Layout.astro';
 const featuredProjects = [
 	{
-		title: 'Pulse Engine',
-		description: 'A combat system prototype built for responsive action, tuned with polish and performance in mind.',
-		meta: 'Systems · Combat · Unity',
-		image: '/images/pulse-engine.svg',
+		title: 'Ball 2 the Wall',
+		description: 'A puzzle platformer prototype developed in a custom engine as part of a team.',
+		meta: 'Level Design · Tools · Custom Engine',
+		image: '/images/B2TW.png',
 		href: '/projects',
 	},
 	{
-		title: 'Skyline Drift',
-		description: 'A spatial platformer with architecture-driven level design and immersive player flow.',
-		meta: 'Design · Player movement · Unreal',
-		image: '/images/skyline-drift.svg',
+		title: 'ConCaveity',
+		description: 'A stealth platformer with simple yet elegant level design and immersive player flow.',
+		meta: 'Design · Player movement · Custom Engine',
+		image: '/images/ConCaveity.png',
 		href: '/projects',
 	},
 	{
-		title: 'Spatial Dialogue',
-		description: "Master's thesis project exploring narrative systems inside procedural environments.",
-		meta: 'Research · Narrative · Interactive spaces',
-		image: '/images/spatial-dialogue.svg',
+		title: 'Real-World Geospatial City Generator',
+		description: "Master's thesis project exploring procedural city generation based on real-world data.",
+		meta: 'Research · Geospatial Data · Unity',
+		image: '/images/Thesis.png',
 		href: '/projects',
 	},
 ];
@@ -29,61 +29,69 @@ const featuredProjects = [
 	<section class="section">
 		<div class="section-header">
 			<span class="section-label">Home</span>
-			<h1 class="page-title">Game development work built to stand out.</h1>
-			<p class="lead">I create gameplay systems, interactive worlds, and creative tools for games that need strong mechanics, polish, and player-first clarity.</p>
+			<h1 class="page-title">Developer, Engineer, Designer, Creator</h1>
+			<p class="lead">Hi!  I make games, thank you for visiting my website and I hope you enjoy your stay!</p>
 		</div>
 
 		<div class="reel-container">
 			<button class="reel-arrow left" id="reelLeft">&larr;</button>
 			<div class="reel" id="reel">
 				<div class="reel-item">
-					<img src="/images/architecture-portfolio.svg" alt="Photo 1" />
+					<img src="/images/Thesis Project.png" alt="Thesis Project" />
 				</div>
 				<div class="reel-item">
-					<video src="/videos/placeholder1.mp4" muted loop autoplay></video>
+					<video src="/videos/Concaveity_Reel.mp4" muted loop autoplay></video>
 				</div>
 				<div class="reel-item">
-					<img src="/images/skyline-drift.svg" alt="Photo 2" />
+					<img src="/images/Eye - Phase 3.gif" alt="Eye Boss" />
 				</div>
 				<div class="reel-item">
-					<video src="/videos/placeholder2.mp4" muted loop autoplay></video>
+					<video src="/videos/B2TW_Reel.mp4" muted loop autoplay></video>
 				</div>
 				<div class="reel-item">
-					<img src="/images/spatial-dialogue.svg" alt="Photo 3" />
+					<img src="/images/Linked Legend.png" alt="Linked Legend" />
 				</div>
 				<div class="reel-item">
-					<video src="/videos/placeholder3.mp4" muted loop autoplay></video>
+					<video src="/videos/Concaveity_Reel_2.mp4" muted loop autoplay></video>
 				</div>
 			</div>
 			<button class="reel-arrow right" id="reelRight">&rarr;</button>
 		</div>
 
-		<script>
-			document.addEventListener('DOMContentLoaded', () => {
-				const reel = document.getElementById('reel') as HTMLElement | null;
-				const leftArrow = document.getElementById('reelLeft') as HTMLButtonElement | null;
-				const rightArrow = document.getElementById('reelRight') as HTMLButtonElement | null;
-				if (!reel || !leftArrow || !rightArrow) return;
-				const reelElement = reel;
+		<script is:inline>
+			(function initReel() {
+				const reel = document.getElementById('reel');
+				const leftArrow = document.getElementById('reelLeft');
+				const rightArrow = document.getElementById('reelRight');
+				
+				// Debug logging to pinpoint exactly what is missing if it still fails
+				if (!reel || !leftArrow || !rightArrow) {
+					console.error("Reel initialization failed. Missing elements:", { reel, leftArrow, rightArrow });
+					return;
+				}
 
-				const originalItems = Array.from(reelElement.children) as HTMLElement[];
+				const originalItems = Array.from(reel.children);
 				const totalItems = originalItems.length;
 				let currentIndex = 0;
 				let isTransitioning = false;
 
-				const firstClone = originalItems[0].cloneNode(true) as HTMLElement;
-				const lastClone = originalItems[totalItems - 1].cloneNode(true) as HTMLElement;
+				// Clone elements for seamless infinite loop
+				const firstClone = originalItems[0].cloneNode(true);
+				const lastClone = originalItems[totalItems - 1].cloneNode(true);
 				reel.insertBefore(lastClone, reel.firstChild);
 				reel.appendChild(firstClone);
 
-				function updatePosition(index: number, instant = false) {
-					reelElement.style.transition = instant ? 'none' : 'transform 0.5s ease';
-					reelElement.style.transform = `translateX(-${(index + 1) * 100}%)`;
+				// Snap immediately to index 0 (the Thesis Project)
+				updatePosition(currentIndex, true);
+
+				function updatePosition(index, instant = false) {
+					reel.style.transition = instant ? 'none' : 'transform 0.7s ease';
+					reel.style.transform = `translateX(-${(index + 1) * 100}%)`;
 
 					if (instant) {
 						requestAnimationFrame(() => {
 							requestAnimationFrame(() => {
-								reelElement.style.transition = 'transform 0.5s ease';
+								reel.style.transition = 'transform 0.7s ease';
 							});
 						});
 					}
@@ -116,10 +124,7 @@ const featuredProjects = [
 
 				leftArrow.addEventListener('click', prevItem);
 				rightArrow.addEventListener('click', nextItem);
-
-				// Auto scroll every 15 seconds
-				setInterval(nextItem, 15000);
-			});
+			})();
 		</script>
 	</section>
 

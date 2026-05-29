@@ -178,7 +178,7 @@ button:hover,
 }
 
 .lead {
-	max-width: 70ch;
+	max-width: 90ch;
 	line-height: 1.8;
 	color: var(--muted);
 	font-size: 1.05rem;
