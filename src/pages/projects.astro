@@ -2,40 +2,58 @@
 import Layout from '../layouts/Layout.astro';
 const projects = [
 	{
-		title: 'Pulse Engine',
-		summary: 'A modular gameplay engine for action RPG systems with responsive combat and dynamic pacing.',
-		role: 'Lead systems engineer',
-		tech: 'Unity, C#, DOTS, gameplay scripting',
-		link: 'https://example.com/pulse-engine',
-		action: 'View demo',
-		image: '/images/pulse-engine.svg',
+		title: 'Ball 2 the Wall',
+		summary: 'A puzzle platformer in a neon setting where you roll, bounce, and press buttons with your balls to reach the goal.',
+		role: 'Producer + Designer + Programmer',
+		tech: 'Custom Engine, level design, C++, OpenGL',
+		link: 'https://www.dropbox.com/scl/fi/22k279evuez4838n9dffd/Ball2TheWall_Setup.zip?rlkey=a29brbra5luyrif4qcxpqz4rg&st=1r1k77fx&dl=0',
+		action: 'Download',
+		image: '/images/B2TW.png',
 	},
 	{
-		title: 'Skyline Drift',
-		summary: 'A narrative-driven platformer that blends architecture-inspired movement with environmental storytelling.',
-		role: 'Designer + programmer',
-		tech: 'Unreal Engine, level design, animation state machines',
-		link: 'https://example.com/skyline-drift',
-		action: 'Open site',
-		image: '/images/skyline-drift.svg',
+		title: 'ConCaveity',
+		summary: 'A stealth platformer where you navigate the dungeons, collect keys, and avoid the gaze of the Evil Eye.',
+		role: 'Producer + Designer + Programmer',
+		tech: 'Custom Engine, level design, C++, OpenGL',
+		link: '/ConCaveity_Setup.zip',
+		action: 'Download',
+		image: '/images/ConCaveity.png',
 	},
 	{
-		title: 'Thesis: Spatial Dialogue',
-		summary: 'Master’s thesis project exploring spatial storytelling and branching player choice inside a modular world.',
-		role: 'Research lead',
-		tech: 'Unity, interactive narrative, procedural layout',
+		title: 'Master’s Thesis',
+		summary: 'Master’s thesis project exploring real-world geospatial data and procedural generation techniques.',
+		role: 'Lead Researcher',
+		tech: 'Unity, ArcGIS, GeoJSON, TypeScript',
 		link: 'https://example.com/thesis',
 		action: 'Read case study',
-		image: '/images/spatial-dialogue.svg',
+		image: '/images/Thesis Project.png',
+	},
+	{
+		title: 'Breakout Effect',
+		summary: 'My first game project building a custom 2D game engine, developed with the help of learnopengl.com.',
+		role: 'Lead Engineer + Designer',
+		tech: 'Custom Engine, C++, OpenGL',
+		link: '',
+		action: 'Unavailable',
+		image: '/images/Breakout Effect.png',
+	},
+	{
+		title: 'Linked Legend',
+		summary: 'A turn-based strategy game where you change the battle, change the course of history, and repeat.',
+		role: 'Designer + Programmer',
+		tech: 'Unity Engine, C#, Rhino for level design',
+		link: '',
+		action: 'Unavailable',
+		image: '/images/Linked Legend.png',
 	},
 	{
 		title: 'Architecture Portfolio',
-		summary: 'A curated gallery of spatial design work, concept studies, and interactive layout thinking.',
-		role: 'Creative director',
-		tech: 'Portfolio site, visual communication, experiential space design',
-		link: 'https://example.com/architecture-portfolio',
-		action: 'Visit portfolio',
-		image: '/images/architecture-portfolio.svg',
+		summary: 'Enjoy some of my early architecture design work and other creative projects from my undergraduate studies.',
+		role: 'Designer',
+		tech: 'Adobe Creative Suite, Rhino, AutoCAD, Revit',
+		link: '/Portfolio_ThomasSpalter.zip',
+		action: 'Download',
+		image: '/images/Architecture_Portfolio.png',
 	},
 ];
 ---
@@ -44,8 +62,8 @@ const projects = [
 	<section class="section">
 		<div class="section-header">
 			<span class="section-label">Projects</span>
-			<h1 class="page-title">Interactive work, thesis research, and polished game systems.</h1>
-			<p class="lead">Each project below includes a link to a live prototype, download, or case study so you can explore the systems and experiences I build.</p>
+			<h1 class="page-title">Interactive Simulations, Thesis Research, and Polished Game Systems.</h1>
+			<p class="lead">Here are some of the projects I've worked on, showcasing my skills in game development, research, and interactive design.  Please feel free to explore the links and downloads!</p>
 		</div>
 
 		<div class="cards">
@@ -56,9 +74,17 @@ const projects = [
 						<h2 class="card-title">{project.title}</h2>
 						<p class="card-meta">{project.role}</p>
 						<p class="card-text">{project.summary}</p>
-						<p class="card-meta">Tech: {project.tech}</p>
+						<p class="card-meta">{project.tech}</p>
 						<div class="project-actions">
-							<a class="button" href={project.link} target="_blank" rel="noreferrer">{project.action}</a>
+							{project.link ? (
+								<a class="button" href={project.link} target="_blank" rel="noreferrer">
+									{project.action}
+								</a>
+							) : (
+								<span class="button style-as-disabled">
+									{project.action}
+								</span>
+							)}
 						</div>
 					</div>
 				</article>

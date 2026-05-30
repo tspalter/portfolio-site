@@ -52,6 +52,7 @@ button,
 	color: #ffffff;
 	font-weight: 600;
 	transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.22s ease;
+	margin-top: 1.5rem;
 }
 
 button:hover,
@@ -228,7 +229,7 @@ button:hover,
 .card-meta {
 	font-size: 0.95rem;
 	color: var(--accent);
-	margin-bottom: 1rem;
+	margin-bottom: 2rem;
 }
 
 .card-text,
@@ -282,7 +283,8 @@ button:hover,
 
 .card-footer,
 .project-actions {
-	margin-top: auto;
+	margin-top: 1rem;
+	margin-bottom: 1rem;
 }
 
 .resume-card {
