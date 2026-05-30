@@ -15,6 +15,7 @@
     "@astrojs/check": "^0.9.9",
     "@astrojs/db": "^0.21.2",
     "@astrojs/node": "^10.1.1",
+    "@astrojs/vercel": "^10.0.8",
     "@joeattardi/emoji-button": "^4.6.4",
     "astro": "^6.3.7",
     "marked": "^18.0.3",
