@@ -1,26 +1,32 @@
 ---
 import Layout from '../layouts/Layout.astro';
 const education = [
-	{ title: 'Master of Science in Game Development', institution: 'Example University', date: '2025', details: 'Specialized in systems design, interactive storytelling, and procedural worlds.' },
-	{ title: 'Bachelor of Science in Computer Science', institution: 'Example Institute of Technology', date: '2022', details: 'Focused on real-time graphics, AI, and game engine development.' },
+	{ title: 'Master of Science in Computer Science', institution: 'DigiPen Institute of Technology', date: '2020-2023', details: 'Concentrations in game development, graphics, and AI.  I also wrote my master thesis on procedural content generation and its applications to the real world.' },
+	{ title: 'Bachelor of Science in Architecture', institution: 'Washington University in St. Louis', date: '2015-2020', details: 'Second Major in Computer Science.  Developed a strong foundation in both design and programming principles.' },
 ];
 
 const experience = [
-	{ title: 'Gameplay Engineer', company: 'Next Level Studio', date: '2024 – Present', summary: 'Built combat and progression systems for a multi-platform action game. Owned feature implementation, tuning, and delivery across sprint cycles.' },
-	{ title: 'Junior Systems Designer', company: 'Indie Arcade Lab', date: '2022 – 2024', summary: 'Designed and shipped mission systems, player incentives, and tutorial flow for a portfolio of indie titles.' },
+	{ title: 'Junior Full Stack AR/VR Developer', company: 'Booz Allen Hamilton', date: '2023-2025', summary: 'Designed XR experiences and applications for military training purposes.  Primarily worked in Unity and C#.' },
+	{ title: 'Technical Designer', company: 'Mojang Studios', date: '2022', summary: 'Helped work on the 2022 Mob Vote Live server, debugging minigames, collaborating with design and engineering teams, and taking charge on localization scripts for a global-scale event.  Programming was primarily done in TypeScript.' },
+	{ title: 'Gameplay Programming Intern', company: 'BoardScore Inc.', date: '2022', summary: 'Worked on implementing and testing gameplay mechanics for YouRiding, a surfing game that simulates real-world locations and conditions.  Primarily worked in Unity and C# debugging issues, particularly with the camera system.' },
 ];
 
 const projects = [
-	{ title: 'AAA-style combat prototype with responsive enemy behavior', role: 'Programmer – Combat systems, enemy AI' },
-	{ title: 'Procedural level generator for narrative exploration', role: 'Systems engineer – Procedural generation, level design tools' },
-	{ title: 'Master thesis game system with architecture-inspired spatial design', role: 'Designer & programmer – Spatial systems, narrative integration' },
-	{ title: 'Platformer toolkit used for rapid iteration and polish', role: 'Tools engineer – Movement mechanics, editor integration' },
+	{ title: 'IVER Maintenance Course Creator', role: 'Lead Programmer & Designer – Developed Unity-based training module for military maintenance procedures' },
+	{ title: 'Project GoldenEye', role: 'Systems Engineer – Android Builds, HTC Vive Tracker synchronization for immmersive AR wargaming application' },
+	{ title: 'MARFORPAC', role: 'Tools Programmer & Bug Scrum Leader – Developed custom build tool for creating multiple builds and handled bug reports' },
+	{ title: 'OceanLens', role: 'Tools & Graphics Engineer – Debugged rendering issues and optimized performance to restore older project to modern Unity builds' },
+	{ title: '2022 Mob Vote Live Server', role: 'Localization Engineer & Technical Designer – Debugged minigames and localized content for a global-scale event' },
+	{ title: 'Real-World Geospatial City Generator', role: 'Lead Programmer & Designer – Extended a procedural city generation system to read real-world data and display in a Unity3D environment' },
+	{ title: 'Ball 2 the Wall (B2TW)', role: 'Producer, Level Designer, Engine Programmer - Developed custom 3D game engine, led team meetings and coordinated development efforts, designed levels and art' },
+	{ title: 'ConCaveity', role: 'Producer, Level Designer, Engine Programmer – Developed custom 2D game engine, led team meetings and coordinated development efforts, designed levels and art' },
+	{ title: 'Linked Legend', role: 'Level Designer, Programmer – Designed levels and implemented gameplay mechanics related to different weapons and game balance' },
 ];
 
 const certifications = [
-	'Unity Certified Programmer',
-	'Unreal Engine Gameplay Framework',
-	'Professional Scrum Product Owner (PSPO I)',
+	'Unity Certified Programmer:  User Level',
+	'Responsive Web Design Certification, freeCodeCamp',
+	'Inactive Secret Clearance, expires 03/2027',
 ];
 ---
 
@@ -28,8 +34,8 @@ const certifications = [
 	<section class="section">
 		<div class="section-header">
 			<span class="section-label">CV</span>
-			<h1 class="page-title">Education, experience, and the full body of work.</h1>
-			<p class="lead">This page collects the core career details and project experience that explain the value I bring to hiring teams.</p>
+			<h1 class="page-title">My Resume, with More Oomph.</h1>
+			<p class="lead">This page details my core career and project experience that demonstrate what I've accomplished.</p>
 		</div>
 
 		<div class="grid-split">
@@ -47,7 +53,7 @@ const certifications = [
 			</div>
 
 			<div class="detail-block">
-				<h2>Professional experience</h2>
+				<h2>Professional Experience</h2>
 				<ul class="detail-list">
 					{experience.map((item) => (
 						<li class="detail-item">
@@ -64,7 +70,7 @@ const certifications = [
 	<section class="section">
 		<div class="section-header">
 			<span class="section-label">Highlights</span>
-			<h2>Projects and certifications that support my work.</h2>
+			<h2>My Projects and Certifications</h2>
 		</div>
 
 		<div class="grid-split">
@@ -91,9 +97,9 @@ const certifications = [
 		</div>
 
 		<div class="card card-footer resume-card">
-			<p class="lead">Download a polished PDF resume to share with recruiters and producers.</p>
+			<p class="lead">Need a copy of my resume?  Click here to download!</p>
 			<div class="resume-button-wrapper">
-				<a class="button button-compact" href="/resume.pdf" download>Download Resume</a>
+				<a class="button button-compact" href="/Resume_SpalterThomas_C.pdf" download>Download Resume</a>
 			</div>
 		</div>
 	</section>
