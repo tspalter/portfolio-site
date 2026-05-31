@@ -302,6 +302,7 @@ button:hover,
 .button-compact {
 	padding: 0.75rem 1.25rem;
 	font-size: 0.95rem;
+	margin: 0 0.5rem;
 }
 
 .grid-split {
@@ -927,3 +928,29 @@ button:hover,
 	color: var(--accent);
 }
 
+/* Ensure the brand link and socials sit side-by-side */
+.brand-container {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; /* Adjusts the spacing between your name and the icons */
+}
+
+/* Align the icons nicely next to each other */
+.header-socials {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Adjusts the spacing between GitHub and LinkedIn */
+}
+
+/* Style the icon links */
+.header-socials a {
+    color: var(--text-color, #333); /* Fallback color, change to match your theme */
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+/* Hover state for some interactivity */
+.header-socials a:hover {
+    color: var(--accent-color, #0076ff); /* Change to your preference */
+}
